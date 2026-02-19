@@ -1,15 +1,17 @@
 name: Build Perfetto UI Container
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - '*-gr'
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: docker-hub
 
     steps:
       - name: Checkout repository
@@ -18,18 +20,17 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GitHub Container Registry
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Extract metadata (tags, labels)
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/perfetto-ui
+          images: ${{ vars.DOCKER_USERNAME }}/perfetto-ui
           tags: |
             type=raw,value=latest
 
@@ -48,8 +49,8 @@ jobs:
           echo "## Build Complete! 🎉" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Image Details" >> $GITHUB_STEP_SUMMARY
-          echo "- **Registry:** ghcr.io" >> $GITHUB_STEP_SUMMARY
-          echo "- **Repository:** ${{ github.repository_owner }}/perfetto-ui" >> $GITHUB_STEP_SUMMARY
+          echo "- **Registry:** Docker Hub" >> $GITHUB_STEP_SUMMARY
+          echo "- **Repository:** ${{ vars.DOCKER_USERNAME }}/perfetto-ui" >> $GITHUB_STEP_SUMMARY
           echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -60,8 +61,8 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Pull and Run" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "docker pull ghcr.io/${{ github.repository_owner }}/perfetto-ui:latest" >> $GITHUB_STEP_SUMMARY
-          echo "docker run -p 8080:8080 ghcr.io/${{ github.repository_owner }}/perfetto-ui:latest" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ vars.DOCKER_USERNAME }}/perfetto-ui:latest" >> $GITHUB_STEP_SUMMARY
+          echo "docker run -p 8080:8080 ${{ vars.DOCKER_USERNAME }}/perfetto-ui:latest" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Then open http://localhost:8080 in your browser." >> $GITHUB_STEP_SUMMARY
