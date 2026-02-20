@@ -10,7 +10,6 @@ __pycache__/
 node_modules/
 
 # Git and CI
-.git/
 .github/
 .gitignore
 

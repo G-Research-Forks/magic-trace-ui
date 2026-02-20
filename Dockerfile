@@ -21,10 +21,7 @@ COPY . .
 
 # Initialize a git repo (required by install-build-deps for git clean)
 RUN git config --global user.email "docker@build" && \
-    git config --global user.name "Docker Build" && \
-    git init && \
-    git add -A && \
-    git commit -m "Initial commit"
+    git config --global user.name "Docker Build"
 
 # Install build dependencies (downloads Node.js, build tools, etc.)
 RUN tools/install-build-deps --ui
@@ -32,17 +29,11 @@ RUN tools/install-build-deps --ui
 # Build the UI (output goes to out/ui/dist)
 RUN ui/build
 
-# Stage 2: Runtime - Serve the built UI with Python HTTP server
-FROM python:3.11-slim
-
-# Create app directory
-WORKDIR /app
+# Stage 2: Runtime - Serve the built UI with nginx
+FROM nginxinc/nginx-unprivileged
 
 # Copy built UI from builder stage
-COPY --from=builder /workspace/out/ui/ui/dist /app/ui
+COPY --from=builder /workspace/out/ui/ui/dist /usr/share/nginx/html
 
-# Expose port 8080
+# Expose port 8080 (nginx-unprivileged default)
 EXPOSE 8080
-
-# Serve the UI using Python's built-in HTTP server
-CMD ["python", "-m", "http.server", "8080", "--directory", "/app/ui"]
