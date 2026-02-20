@@ -34,6 +34,3 @@ FROM nginxinc/nginx-unprivileged
 
 # Copy built UI from builder stage
 COPY --from=builder /workspace/out/ui/ui/dist /usr/share/nginx/html
-
-# Expose port 8080 (nginx-unprivileged default)
-EXPOSE 8080
