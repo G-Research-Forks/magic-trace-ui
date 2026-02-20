@@ -33,4 +33,4 @@ RUN ui/build
 FROM nginxinc/nginx-unprivileged
 
 # Copy built UI from builder stage
-COPY --from=builder /workspace/out/ui/ui/dist /usr/share/nginx/html
+COPY --chmod=755 --from=builder /workspace/out/ui/ui/dist /usr/share/nginx/html
