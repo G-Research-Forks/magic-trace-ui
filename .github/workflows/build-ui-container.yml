@@ -1,4 +1,4 @@
-name: Build Perfetto UI Container
+name: Build magic-trace UI Container
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ vars.DOCKER_USERNAME }}/perfetto-ui
+          images: ${{ vars.DOCKER_USERNAME }}/magic-trace-ui
 
       - name: Build and push container image
         uses: docker/build-push-action@v5
